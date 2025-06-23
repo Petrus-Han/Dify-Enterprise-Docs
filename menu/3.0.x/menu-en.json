@@ -12,59 +12,59 @@
     {
       "group": "Deployment",
       "pages": [
-        "en-us/deployment/checklist",
-        "en-us/deployment/resources-checklist",
+        "3-0-x/en-us/deployment/checklist",
+        "3-0-x/en-us/deployment/resources-checklist",
         {
           "group": "Quick Start for POC",
           "pages": [
-            "en-us/deployment/prerequisites/kubernetes",
-            "en-us/deployment/prerequisites/minikube",
-            "en-us/deployment/prerequisites/docker-compose"
+            "3-0-x/en-us/deployment/prerequisites/kubernetes",
+            "3-0-x/en-us/deployment/prerequisites/minikube",
+            "3-0-x/en-us/deployment/prerequisites/docker-compose"
           ]
         },
         {
           "group": "Deployment for Testing and Production",
           "pages": [
-            "en-us/deployment/test-production/testing-deployment",
-            "en-us/deployment/test-production/production-deployment"
+            "3-0-x/en-us/deployment/test-production/testing-deployment",
+            "3-0-x/en-us/deployment/test-production/production-deployment"
           ]
         },
-        "en-us/deployment/license-activation",
-        "en-us/deployment/verify-services-status",
+        "3-0-x/en-us/deployment/license-activation",
+        "3-0-x/en-us/deployment/verify-services-status",
         {
           "group": "Advanced Configuration",
           "pages": [
-            "en-us/deployment/advanced-configuration/persistent-storage",
-            "en-us/deployment/advanced-configuration/postgresql-database",
-            "en-us/deployment/advanced-configuration/redis",
+            "3-0-x/en-us/deployment/advanced-configuration/persistent-storage",
+            "3-0-x/en-us/deployment/advanced-configuration/postgresql-database",
+            "3-0-x/en-us/deployment/advanced-configuration/redis",
             {
               "group": "Vector Database",
               "pages": [
-                "en-us/deployment/advanced-configuration/vector-database",
-                "en-us/deployment/advanced-configuration/qdrant/single-node",
-                "en-us/deployment/advanced-configuration/qdrant/qdrant-cluster"
+                "3-0-x/en-us/deployment/advanced-configuration/vector-database",
+                "3-0-x/en-us/deployment/advanced-configuration/qdrant/single-node",
+                "3-0-x/en-us/deployment/advanced-configuration/qdrant/qdrant-cluster"
               ]
             },
-            "en-us/deployment/advanced-configuration/rag",
-            "en-us/deployment/advanced-configuration/email-provider",
-            "en-us/deployment/advanced-configuration/file-upload",
-            "en-us/deployment/advanced-configuration/nginx-ingress-controller",
-            "en-us/deployment/advanced-configuration/domain-and-ssl-certificate",
-            "en-us/deployment/advanced-configuration/dify-system-logo",
-            "en-us/deployment/advanced-configuration/model-provider",
-            "en-us/deployment/advanced-configuration/tools",
-            "en-us/deployment/advanced-configuration/environment-variables",
-            "en-us/deployment/advanced-configuration/dify-helm-chart",
+            "3-0-x/en-us/deployment/advanced-configuration/rag",
+            "3-0-x/en-us/deployment/advanced-configuration/email-provider",
+            "3-0-x/en-us/deployment/advanced-configuration/file-upload",
+            "3-0-x/en-us/deployment/advanced-configuration/nginx-ingress-controller",
+            "3-0-x/en-us/deployment/advanced-configuration/domain-and-ssl-certificate",
+            "3-0-x/en-us/deployment/advanced-configuration/dify-system-logo",
+            "3-0-x/en-us/deployment/advanced-configuration/model-provider",
+            "3-0-x/en-us/deployment/advanced-configuration/tools",
+            "3-0-x/en-us/deployment/advanced-configuration/environment-variables",
+            "3-0-x/en-us/deployment/advanced-configuration/dify-helm-chart",
             {
               "group": "Docker",
               "pages": [
-                "en-us/deployment/advanced-configuration/docker/docker-registry"
+                "3-0-x/en-us/deployment/advanced-configuration/docker/docker-registry"
               ]
             },
             {
               "group": "Docker Compose",
               "pages": [
-                "en-us/deployment/advanced-configuration/docker-compose/icon-customization"
+                "3-0-x/en-us/deployment/advanced-configuration/docker-compose/icon-customization"
               ]
             }
           ]
@@ -72,14 +72,14 @@
         {
           "group": "Cloud Infrastructure",
           "pages": [
-            "en-us/deployment/cloud-infrastructure/azure-poc-infra-setup",
-            "en-us/deployment/cloud-infrastructure/aws-setup"
+            "3-0-x/en-us/deployment/cloud-infrastructure/azure-poc-infra-setup",
+            "3-0-x/en-us/deployment/cloud-infrastructure/aws-setup"
           ]
         },
         {
           "group": "FAQ",
           "pages": [
-            "en-us/deployment/faq/deploying"
+            "3-0-x/en-us/deployment/faq/deploying"
           ]
         }
       ]
@@ -87,17 +87,17 @@
     {
       "group": "Administrator Guide",
       "pages": [
-        "en-us/administrator-guide/workspace-management",
+        "3-0-x/en-us/administrator-guide/workspace-management",
         {
           "group": "Members Management",
           "pages": [
-            "en-us/administrator-guide/members-management",
+            "3-0-x/en-us/administrator-guide/members-management",
             {
               "group": "Members Synchronization",
               "pages": [
-                "en-us/administrator-guide/members/synchronization/sync-team-members",
-                "en-us/administrator-guide/members/synchronization/azure",
-                "en-us/administrator-guide/members/synchronization/okta"
+                "3-0-x/en-us/administrator-guide/members/synchronization/sync-team-members",
+                "3-0-x/en-us/administrator-guide/members/synchronization/azure",
+                "3-0-x/en-us/administrator-guide/members/synchronization/okta"
               ]
             }
           ]
@@ -105,104 +105,104 @@
         {
           "group": "Identity Authentication",
           "pages": [
-            "versions/2-8-x/en-us/administrator-guide/authentication/introduction",
-            "versions/2-8-x/en-us/administrator-guide/authentication/enterprise-user-auth",
-            "versions/2-8-x/en-us/administrator-guide/authentication/webapp-external-user-auth",
+            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/introduction",
+            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/enterprise-user-auth",
+            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/webapp-external-user-auth",
             {
               "group": "Configure SSO Authentication",
               "pages": [
-                "versions/2-8-x/en-us/administrator-guide/sso/introduction",
+                "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/introduction",
                 {
                   "group": "Okta",
                   "pages": [
-                    "versions/2-8-x/en-us/administrator-guide/sso/okta/oidc",
-                    "versions/2-8-x/en-us/administrator-guide/sso/okta/saml",
-                    "versions/2-8-x/en-us/administrator-guide/sso/okta/oauth2"
+                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/oidc",
+                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/saml",
+                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/oauth2"
                   ]
                 },
                 {
                   "group": "Azure",
                   "pages": [
-                    "versions/2-8-x/en-us/administrator-guide/sso/azure/saml"
+                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/azure/saml"
                   ]
                 },
                 {
                   "group": "GitHub",
                   "pages": [
-                    "versions/2-8-x/en-us/administrator-guide/sso/github/oauth2"
+                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/github/oauth2"
                   ]
                 }
               ]
             },
-            "en-us/administrator-guide/2sv"
+            "3-0-x/en-us/administrator-guide/2sv"
           ]
         },
-        "en-us/administrator-guide/admin-apis",
-        "en-us/administrator-guide/branding",
+        "3-0-x/en-us/administrator-guide/admin-apis",
+        "3-0-x/en-us/administrator-guide/branding",
         {
           "group": "System Settings",
           "pages": [
-            "versions/2-8-x/en-us/administrator-guide/systems/users",
-            "versions/2-8-x/en-us/administrator-guide/systems/2sv"
+            "versions/2-8-x/3-0-x/en-us/administrator-guide/systems/users",
+            "versions/2-8-x/3-0-x/en-us/administrator-guide/systems/2sv"
           ]
         },
-        "en-us/administrator-guide/faq"
+        "3-0-x/en-us/administrator-guide/faq"
       ]
     },
     {
       "group": "User Guide",
       "pages": [
-        "en-us/user-guide/welcome",
+        "3-0-x/en-us/user-guide/welcome",
         {
           "group": "Model",
           "pages": [
-            "en-us/user-guide/models/model-configuration",
-            "en-us/user-guide/models/new-provider",
-            "en-us/user-guide/models/predefined-model",
-            "en-us/user-guide/models/customizable-model",
-            "en-us/user-guide/models/interfaces",
-            "en-us/user-guide/models/schema",
-            "en-us/user-guide/models/load-balancing"
+            "3-0-x/en-us/user-guide/models/model-configuration",
+            "3-0-x/en-us/user-guide/models/new-provider",
+            "3-0-x/en-us/user-guide/models/predefined-model",
+            "3-0-x/en-us/user-guide/models/customizable-model",
+            "3-0-x/en-us/user-guide/models/interfaces",
+            "3-0-x/en-us/user-guide/models/schema",
+            "3-0-x/en-us/user-guide/models/load-balancing"
           ]
         },
         {
           "group": "Application Orchestration",
           "pages": [
-            "en-us/user-guide/build-app/chatbot",
-            "en-us/user-guide/build-app/text-generator",
-            "en-us/user-guide/build-app/agent",
+            "3-0-x/en-us/user-guide/build-app/chatbot",
+            "3-0-x/en-us/user-guide/build-app/text-generator",
+            "3-0-x/en-us/user-guide/build-app/agent",
             {
               "group": "Chatflow & Workflow",
               "pages": [
-                "en-us/user-guide/build-app/flow-app/concepts",
-                "en-us/user-guide/build-app/flow-app/create-flow-app",
-                "en-us/user-guide/build-app/flow-app/variables",
+                "3-0-x/en-us/user-guide/build-app/flow-app/concepts",
+                "3-0-x/en-us/user-guide/build-app/flow-app/create-flow-app",
+                "3-0-x/en-us/user-guide/build-app/flow-app/variables",
                 {
                   "group": "Nodes",
                   "pages": [
-                    "en-us/user-guide/build-app/flow-app/nodes/start",
-                    "en-us/user-guide/build-app/flow-app/nodes/end",
-                    "en-us/user-guide/build-app/flow-app/nodes/answer",
-                    "en-us/user-guide/build-app/flow-app/nodes/llm",
-                    "en-us/user-guide/build-app/flow-app/nodes/knowledge-retrieval",
-                    "en-us/user-guide/build-app/flow-app/nodes/question-classifier",
-                    "en-us/user-guide/build-app/flow-app/nodes/ifelse",
-                    "en-us/user-guide/build-app/flow-app/nodes/code",
-                    "en-us/user-guide/build-app/flow-app/nodes/template",
-                    "en-us/user-guide/build-app/flow-app/nodes/doc-extractor",
-                    "en-us/user-guide/build-app/flow-app/nodes/list-operator",
-                    "en-us/user-guide/build-app/flow-app/nodes/variable-aggregator",
-                    "en-us/user-guide/build-app/flow-app/nodes/variable-assigner",
-                    "en-us/user-guide/build-app/flow-app/nodes/iteration",
-                    "en-us/user-guide/build-app/flow-app/nodes/parameter-extractor",
-                    "en-us/user-guide/build-app/flow-app/nodes/http-request",
-                    "en-us/user-guide/build-app/flow-app/nodes/tools"
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/start",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/end",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/answer",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/llm",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/knowledge-retrieval",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/question-classifier",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/ifelse",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/code",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/template",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/doc-extractor",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/list-operator",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/variable-aggregator",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/variable-assigner",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/iteration",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/parameter-extractor",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/http-request",
+                    "3-0-x/en-us/user-guide/build-app/flow-app/nodes/tools"
                   ]
                 },
-                "en-us/user-guide/build-app/flow-app/shotcut-key",
-                "en-us/user-guide/build-app/flow-app/orchestrate-node",
-                "en-us/user-guide/build-app/flow-app/file-upload",
-                "en-us/user-guide/build-app/flow-app/additional-features"
+                "3-0-x/en-us/user-guide/build-app/flow-app/shotcut-key",
+                "3-0-x/en-us/user-guide/build-app/flow-app/orchestrate-node",
+                "3-0-x/en-us/user-guide/build-app/flow-app/file-upload",
+                "3-0-x/en-us/user-guide/build-app/flow-app/additional-features"
               ]
             }
           ]
@@ -213,11 +213,11 @@
             {
               "group": "Chatflow & Workflow",
               "pages": [
-                "en-us/user-guide/debug-app/chatflow-and-workflow/preview-and-run",
-                "en-us/user-guide/debug-app/chatflow-and-workflow/step-run",
-                "en-us/user-guide/debug-app/chatflow-and-workflow/log",
-                "en-us/user-guide/debug-app/chatflow-and-workflow/checklist",
-                "en-us/user-guide/debug-app/chatflow-and-workflow/history"
+                "3-0-x/en-us/user-guide/debug-app/chatflow-and-workflow/preview-and-run",
+                "3-0-x/en-us/user-guide/debug-app/chatflow-and-workflow/step-run",
+                "3-0-x/en-us/user-guide/debug-app/chatflow-and-workflow/log",
+                "3-0-x/en-us/user-guide/debug-app/chatflow-and-workflow/checklist",
+                "3-0-x/en-us/user-guide/debug-app/chatflow-and-workflow/history"
               ]
             }
           ]
@@ -225,39 +225,39 @@
         {
           "group": "Application Publishing",
           "pages": [
-            "versions/2-8-x/en-us/user-guide/application-publishing/permission-management",
+            "versions/2-8-x/3-0-x/en-us/user-guide/application-publishing/permission-management",
             {
               "group": "Publish as a Single-page Web App",
               "pages": [
-                "en-us/user-guide/application-publishing/launch-your-webapp-quickly/web-app-settings",
-                "en-us/user-guide/application-publishing/launch-your-webapp-quickly/text-generator",
-                "en-us/user-guide/application-publishing/launch-your-webapp-quickly/conversation-application"
+                "3-0-x/en-us/user-guide/application-publishing/launch-your-webapp-quickly/web-app-settings",
+                "3-0-x/en-us/user-guide/application-publishing/launch-your-webapp-quickly/text-generator",
+                "3-0-x/en-us/user-guide/application-publishing/launch-your-webapp-quickly/conversation-application"
               ]
             },
-            "en-us/user-guide/application-publishing/embedding-in-websites",
-            "en-us/user-guide/application-publishing/developing-with-apis",
-            "en-us/user-guide/application-publishing/based-on-frontend-templates"
+            "3-0-x/en-us/user-guide/application-publishing/embedding-in-websites",
+            "3-0-x/en-us/user-guide/application-publishing/developing-with-apis",
+            "3-0-x/en-us/user-guide/application-publishing/based-on-frontend-templates"
           ]
         },
         {
           "group": "Management",
           "pages": [
-            "en-us/user-guide/management/app-management",
-            "en-us/user-guide/management/team-members-management",
-            "en-us/user-guide/management/personal-account-management"
+            "3-0-x/en-us/user-guide/management/app-management",
+            "3-0-x/en-us/user-guide/management/team-members-management",
+            "3-0-x/en-us/user-guide/management/personal-account-management"
           ]
         },
         {
           "group": "Monitoring",
           "pages": [
-            "en-us/user-guide/monitoring/analysis",
-            "en-us/user-guide/monitoring/logs",
-            "en-us/user-guide/monitoring/annotation-reply",
+            "3-0-x/en-us/user-guide/monitoring/analysis",
+            "3-0-x/en-us/user-guide/monitoring/logs",
+            "3-0-x/en-us/user-guide/monitoring/annotation-reply",
             {
               "group": "Integrate External Ops Tools",
               "pages": [
-                "en-us/user-guide/monitoring/integrate-external-ops-tools/integrate-langfuse",
-                "en-us/user-guide/monitoring/integrate-external-ops-tools/integrate-langsmith"
+                "3-0-x/en-us/user-guide/monitoring/integrate-external-ops-tools/integrate-langfuse",
+                "3-0-x/en-us/user-guide/monitoring/integrate-external-ops-tools/integrate-langsmith"
               ]
             }
           ]
