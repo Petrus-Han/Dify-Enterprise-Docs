@@ -1,0 +1,214 @@
+---
+title: AWS 部署指南
+version: '简体中文'
+
+---
+
+# Dify Enterprise Edition 部署指南（AWS）
+
+为确保顺利部署 Dify 企业版，请按照以下基础设施与配置说明进行操作。
+
+---
+
+## 一、基础设施要求
+
+### 需要权限的 AWS 服务：
+
+- **S3**
+- **ECR**
+
+### 支持的认证方式：
+
+Dify 支持以下两种方式访问 AWS 服务：
+
+- **Access Key 模式（AK/SK）**：通过环境变量提供凭证
+- **IRSA 模式**：IAM Roles for Service Accounts，实现更安全、精细的权限控制
+
+---
+
+## 二、Access Key 模式配置
+
+### 步骤 1：准备凭证
+
+创建一个只具备 **S3** 和 **ECR** 权限的 IAM 用户，获取其 Access Key 和 Secret Key。
+
+### 步骤 2：创建 Kubernetes Secret
+
+```bash
+kubectl create secret generic image-repo-secret --from-file=<path to .aws/credentials>
+```
+
+### 步骤 3：修改 `values.yaml`
+
+```yaml
+persistence:
+  type: "s3"
+  s3:
+    endpoint: "https://s3.{region_code}.amazonaws.com"
+    region: "{region_code}"
+    bucketName: "your_bucket_name"
+    useAwsS3: true
+    useAwsManagedIam: false
+    accessKey: "{your access key}"
+    secretKey: "{your secret key}"
+
+# 新增两个服务：
+plugin_daemon:
+  enabled: true
+  replicas: 1
+  apiKey: "dify123456"
+
+plugin_connector:
+  apiKey: "dify123456"
+  imageRepoSecret: "image-repo-secret"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoType: ecr
+  ecrRegion: "us-west-2"
+```
+
+### 步骤 4：配置 `dify_plugin_daemon` 数据库
+
+```yaml
+externalPostgres:
+  enabled: true
+  address: "rds_address"
+  port: "5432"
+  credentials:
+    plugin_daemon:
+      database: "dify_plugin_daemon"
+      username: "{user}"
+      password: "{password}"
+      sslmode: "disable"
+```
+
+### 步骤 5：升级 Helm Release
+
+```bash
+helm upgrade dify dify/dify-ee -n default --version 3.0.0
+```
+
+---
+
+## 三、IRSA 模式配置
+
+由于 AK/SK 在企业中管控严格，推荐使用 AWS Pod Identity（IRSA）进行授权。
+
+### ✅ 优势
+
+- 遵循 AWS 最佳安全实践
+- 支持插件细粒度权限控制
+
+### 🪄 快速配置
+
+### 预设条件
+
+- 已有可用的 AWS Region 和 EKS 集群。
+- 已创建的 S3 存储桶（用于 Dify 文件存储）。
+- 本地已安装并配置好 `kubectl`，可访问目标 EKS 集群。
+- 本地已安装 AWS CLI 并配置凭据。
+
+### 创建角色
+
+| IAM Role            | 说明                        |
+| ------------------- | --------------------------- |
+| IAM Role - S3       | 完整 S3 访问权限            |
+| IAM Role - S3 + ECR | 拥有完整 S3 和 ECR 访问权限 |
+| IAM Role - ECR Pull | 仅支持拉取 ECR 镜像         |
+
+### 创建 Kubernetes ServiceAccount 并关联 IAM Role
+
+| pod 名称 | ServiceAccount 名称                | IAM Role            | 用途说明                       |
+| ------------------------------- | ----------------------- | ------------------- | ------------------------------ |
+| dify-api, dify-worker           | `dify-api-sa`           | IAM Role - S3       | 后端服务访问 S3 用于上传文件等 |
+| dify-plugin-crd                 | `dify-plugin-crd-sa`    | IAM Role - S3 + ECR | 访问 S3 和操作插件镜像仓库     |
+| dify-plugin-runner              | `dify-plugin-runner-sa` | IAM Role - ECR Pull | 拉取插件镜像运行插件           |
+
+### 创建或检查的资源汇总
+
+| 类型          | 名称（示例）                               | 是否必须 | 说明                             |
+| ------------- | ------------------------------------------ | ------------ | -------------------------------- |
+| EKS 集群      | 例如：`dify-dev-cluster`                   | ✅            | 必须存在并已启用 OIDC 提供者     |
+| S3 桶         | 例如：`dify-ee-storage`                    | ✅            | 必须存在并可访问                 |
+| ECR 仓库      | 例如：`dify-ee-plugin-repo` | 可自动创建   | 若不存在可创建                   |
+| IAM Role      | 上述三种角色                               | ✅            | 如果已存在则复用，否则需要创建   |
+| IAM Policy    | S3、ECR、ECR Pull 权限策略                 | ✅            | 关联到对应角色，若不存在需要创建 |
+| OIDC Provider | 从 EKS 获取并与 IAM 建立关联               | ✅            | 用于 IRSA 信任策略               |
+
+---
+
+用户也可联系 Dify 原厂技术支持团队提供一键脚本
+
+`bash ./irsa_one_click.sh`
+
+
+
+✅ 完成以上操作后，即可继续执行后续部署流程。
+
+### 修改 `values.yaml`
+
+```yaml
+persistence:
+  type: "s3"
+  s3:
+    endpoint: "https://s3.{region_code}.amazonaws.com"
+    region: "{region_code}"
+    bucketName: "your_bucket_name"
+    useAwsS3: true
+    useAwsManagedIam: true
+
+api:
+  enabled: true
+  replicas: 1
+  innerApi:
+    enabled: true
+    apiKey: "dify123456"
+  serviceAccountName: "dify-api-sa"
+
+worker:
+  enabled: true
+  replicas: 1
+  serviceAccountName: "dify-api-sa"
+
+plugin_daemon:
+  enabled: true
+  replicas: 1
+  apiKey: "dify123456"
+
+plugin_connector:
+  apiKey: "dify123456"
+  customServiceAccount: "dify-plugin-build-sa"
+  runnerServiceAccount: "dify-plugin-build-run-sa"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoType: ecr
+  ecrRegion: "us-west-2"
+```
+
+### 添加插件数据库配置
+
+```yaml
+externalPostgres:
+  enabled: true
+  address: "rds_address"
+  port: "5432"
+  credentials:
+    plugin_daemon:
+      database: "dify_plugin_daemon"
+      username: "{user}"
+      password: "{password}"
+      sslmode: "disable"
+```
+
+## 四、升级 Helm Release
+
+```bash
+helm upgrade dify dify/dify-ee -n default --version 3.0.0
+```
+
+---
+
+## 注意事项
+
+- ❌ **不支持 Redis Cluster 模式**
+- 🌐 EKS 节点需能访问互联网或配置 NAT Gateway
+
+---
