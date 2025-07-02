@@ -61,7 +61,7 @@ plugin_daemon:
 plugin_connector:
   apiKey: "dify123456"
   imageRepoSecret: "image-repo-secret"
-  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
 ```
@@ -91,60 +91,67 @@ helm upgrade dify dify/dify-ee -n default --version 3.0.0
 
 ## 三、IRSA 模式配置
 
-由于 AK/SK 在企业中管控严格，推荐使用 AWS Pod Identity（IRSA）进行授权。
+由于企业环境对 Access Key 管控严格，我们推荐使用 AWS Pod Identity (IRSA) 方式来访问资源。
 
 ### ✅ 优势
 
 - 遵循 AWS 最佳安全实践
-- 支持插件细粒度权限控制
+- 可对插件执行环境进行精细化权限管理
 
-### 🪄 快速配置
+### 🪄 快速配置（推荐）
 
-### 预设条件
+#### **步骤 1：创建 IAM Role 和 Service Account**
 
-- 已有可用的 AWS Region 和 EKS 集群。
-- 已创建的 S3 存储桶（用于 Dify 文件存储）。
-- 本地已安装并配置好 `kubectl`，可访问目标 EKS 集群。
-- 本地已安装 AWS CLI 并配置凭据。
+- ##### **前置条件**
 
-### 创建角色
+  - 可用的 AWS 区域以及 EKS 集群
+  - 已存在的 S3 Bucket 用于 Dify 文件存储
+  - 本地已安装并配置好 kubectl，可访问目标 EKS 集群
+  - 本地已安装 AWS CLI 并配置好凭证
 
-| IAM Role            | 说明                        |
-| ------------------- | --------------------------- |
-| IAM Role - S3       | 完整 S3 访问权限            |
-| IAM Role - S3 + ECR | 拥有完整 S3 和 ECR 访问权限 |
-| IAM Role - ECR Pull | 仅支持拉取 ECR 镜像         |
+##### **🚀 方案 A：运行一键脚本**
 
-### 创建 Kubernetes ServiceAccount 并关联 IAM Role
+​	**‼️ 一键脚本仅用于演示和测试，请根据自己的安全要求编写生产脚本。可向 Dify FDE 团队获取此演示脚本。**
 
-| pod 名称 | ServiceAccount 名称                | IAM Role            | 用途说明                       |
-| ------------------------------- | ----------------------- | ------------------- | ------------------------------ |
-| dify-api, dify-worker           | `dify-api-sa`           | IAM Role - S3       | 后端服务访问 S3 用于上传文件等 |
-| dify-plugin-crd                 | `dify-plugin-crd-sa`    | IAM Role - S3 + ECR | 访问 S3 和操作插件镜像仓库     |
-| dify-plugin-runner              | `dify-plugin-runner-sa` | IAM Role - ECR Pull | 拉取插件镜像运行插件           |
+```bash
+./irsa_one_click.sh
+```
 
-### 创建或检查的资源汇总
+##### **🔨 方案 B：手动配置**
 
-| 类型          | 名称（示例）                               | 是否必须 | 说明                             |
-| ------------- | ------------------------------------------ | ------------ | -------------------------------- |
-| EKS 集群      | 例如：`dify-dev-cluster`                   | ✅            | 必须存在并已启用 OIDC 提供者     |
-| S3 桶         | 例如：`dify-ee-storage`                    | ✅            | 必须存在并可访问                 |
-| ECR 仓库      | 例如：`dify-ee-plugin-repo` | 可自动创建   | 若不存在可创建                   |
-| IAM Role      | 上述三种角色                               | ✅            | 如果已存在则复用，否则需要创建   |
-| IAM Policy    | S3、ECR、ECR Pull 权限策略                 | ✅            | 关联到对应角色，若不存在需要创建 |
-| OIDC Provider | 从 EKS 获取并与 IAM 建立关联               | ✅            | 用于 IRSA 信任策略               |
+1. **为 EKS 集群启用 IAM OIDC Provider**
 
----
+   请参考 [AWS 官方文档](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html)，将 EKS 集群与 OIDC 身份提供者关联。此步骤是使用 IRSA 的前提。
 
-用户也可联系 Dify 原厂技术支持团队提供一键脚本
+2. **创建 IAM Policy**
 
-`bash ./irsa_one_click.sh`
+   | **项目**        | **示例命名**                                     | **描述**                                    |
+   | --------------- | ------------------------------------------------ | ------------------------------------------- |
+   | S3 Policy 名称  | dify-ee-irsa-<cluster_name>-s3-policy            | 对指定 S3 Bucket 具有完全访问权限           |
+   | ECR Policy 名称 | dify-ee-irsa-<cluster_name>-ecr-policy           | 对 ECR 完全访问权限及对 CloudTrail 只读权限 |
+   | ECR Policy 名称 | dify-ee-irsa-<cluster_name>-ecr-pull-only-policy | 仅允许从 ECR 拉取镜像                       |
 
+3. **创建关联 Policy 的 IAM Role**
 
+   | **项目**                 | **示例命名**                              | **policy**                                                   |
+   | ------------------------ | ----------------------------------------- | ------------------------------------------------------------ |
+   | IAM Role - S3            | DifyEE-Role-<cluster_name>-s3             | dify-ee-irsa-<cluster_name>-s3-policy                        |
+   | IAM Role - S3 + ECR      | DifyEE-Role-<cluster_name>-s3-ecr         | dify-ee-irsa-<cluster_name>-s3-policy 和 dify-ee-irsa-<cluster_name>-ecr-policy |
+   | IAM Role - ECR Pull-only | DifyEE-Role-<cluster_name>-ecr-image-pull | dify-ee-irsa-<cluster_name>-ecr-pull-only-policy             |
 
-✅ 完成以上操作后，即可继续执行后续部署流程。
+4. **为 IAM Role 创建 ServiceAccount**
 
-### 修改 `values.yaml`
+   | **用途**                     | **默认名称**          | **绑定 IAM Role**                         | **描述**                        |
+   | ---------------------------- | --------------------- | ----------------------------------------- | ------------------------------- |
+   | dify-api、dify-worker 使用   | dify-api-sa           | DifyEE-Role-<cluster_name>-s3             | 后端服务访问 S3，例如文件上传等 |
+   | dify-plugin-crd 镜像构建使用 | dify-plugin-crd-sa    | DifyEE-Role-<cluster_name>-s3-ecr         | 访问 S3 并操作插件镜像仓库      |
+   | dify-plugin 运行时使用       | dify-plugin-runner-sa | DifyEE-Role-<cluster_name>-ecr-image-pull | 用于拉取插件运行所需镜像        |
+
+#### 步骤 2：设置环境变量
+
+根据版本发布说明配置所需变量（如 `S3_REGION`、`S3_BUCKET_NAME` 等）。
+
+#### 步骤 3：修改 `values.yaml`
 
 ```yaml
 persistence:
@@ -178,12 +185,12 @@ plugin_connector:
   apiKey: "dify123456"
   customServiceAccount: "dify-plugin-build-sa"
   runnerServiceAccount: "dify-plugin-build-run-sa"
-  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
 ```
 
-### 添加插件数据库配置
+#### 步骤 4：添加插件数据库配置
 
 ```yaml
 externalPostgres:
@@ -198,13 +205,13 @@ externalPostgres:
       sslmode: "disable"
 ```
 
-## 四、升级 Helm Release
+#### 步骤 5：根据发布日志升级
 
-```bash
-helm upgrade dify dify/dify-ee -n default --version 3.0.0
-```
+https://langgenius.github.io/dify-helm/#/pages/3_0_0
 
 ---
+
+
 
 ## 注意事项
 

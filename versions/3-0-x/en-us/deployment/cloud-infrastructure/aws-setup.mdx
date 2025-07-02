@@ -10,6 +10,12 @@ To ensure a smooth deployment of Dify Enterprise Edition, please follow the infr
 
 ---
 
+## Notes
+
+**‼️ Please make sure you have upgraded to version 2.8.0 and completed the migration.**‼️
+
+
+
 ## 1. Infrastructure Requirements
 
 ### Required AWS Services:
@@ -19,18 +25,18 @@ To ensure a smooth deployment of Dify Enterprise Edition, please follow the infr
 
 ### Supported Authentication Methods:
 
-Dify supports the following two methods to access AWS services:
+Dify supports the following two approaches for accessing AWS services:
 
-- **Access Key Mode (AK/SK):** Provide credentials via environment variables  
-- **IRSA Mode:** IAM Roles for Service Accounts, allowing more secure and fine-grained access control
+- **Access Key Mode (AK/SK):** Provide credentials via environment variables
+- **IRSA Mode:** IAM Roles for Service Accounts to enable secure and fine-grained access control
 
 ---
 
-## 2. Access Key Mode Configuration
+## 2. Access Key Mode
 
 ### Step 1: Prepare Credentials
 
-Create an IAM user with permissions for **S3** and **ECR** only, and obtain its Access Key and Secret Key.
+Create an IAM user with only **S3** and **ECR** permissions. Obtain its Access Key and Secret Key.
 
 ### Step 2: Create Kubernetes Secret
 
@@ -38,7 +44,7 @@ Create an IAM user with permissions for **S3** and **ECR** only, and obtain its 
 kubectl create secret generic image-repo-secret --from-file=<path to .aws/credentials>
 ```
 
-### Step 3: Modify `values.yaml`
+### Step 3: Update `values.yaml`
 
 ```yaml
 persistence:
@@ -60,12 +66,12 @@ plugin_daemon:
 plugin_connector:
   apiKey: "dify123456"
   imageRepoSecret: "image-repo-secret"
-  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
 ```
 
-### Step 4: Configure `dify_plugin_daemon` Database
+### Step 4: Configure Plugin Daemon Database
 
 ```yaml
 externalPostgres:
@@ -83,67 +89,74 @@ externalPostgres:
 ### Step 5: Upgrade Helm Release
 
 ```bash
-helm upgrade dify dify/dify-ee -n default --version 3.0.0
+helm upgrade dify dify/dify-ee -n default --version 3.0.0-beta
 ```
 
 ---
 
-## 3. IRSA Mode Configuration
+## 3. IRSA Mode
 
-Since AK/SK is strictly controlled in enterprises, it is recommended to use AWS Pod Identity (IRSA) for authorization.
+Since Access Keys are strictly controlled in enterprise environments, we recommend using AWS Pod Identity (IRSA) for access.
 
 ### ✅ Benefits
 
-- Follows AWS security best practices  
-- Supports fine-grained permissions for plugin operations
+- Follows AWS security best practices
+- Enables fine-grained control over plugin execution environments
 
-### 🪄 Quick Setup
+### Setup
 
-### Prerequisites
+#### Step 1: Set up IAM role and Service Account
 
-- An available AWS region and EKS cluster  
-- A created S3 bucket for Dify file storage  
-- `kubectl` installed and configured locally with access to the target EKS cluster  
-- AWS CLI installed and credentials configured
+- ##### **Prerequisites**
 
-### IAM Roles to Create
+  - An available AWS Region and EKS cluster.
+  - An existing S3 bucket for Dify file storage.
+  - `kubectl` is installed and configured locally, and can access the target EKS cluster.
+  - AWS CLI is installed and credentials are configured locally.
 
-| IAM Role            | Description                    |
-| ------------------- | ------------------------------ |
-| IAM Role - S3       | Full access to S3              |
-| IAM Role - S3 + ECR | Full access to both S3 and ECR |
-| IAM Role - ECR Pull | Pull-only access to ECR images |
+##### 🚀Option A: Run One-Click Script
 
-### Create Kubernetes ServiceAccounts and Associate with IAM Roles
+​	**‼️The one-click script is for demo and testing purposes only. Please develop your own script to meet your security requirements. You 	can obtain this demo script from the Dify FDE team.** 
 
-| Pod Name              | ServiceAccount Name     | IAM Role            | Description                                      |
-| --------------------- | ----------------------- | ------------------- | ------------------------------------------------ |
-| dify-api, dify-worker | `dify-api-sa`           | IAM Role - S3       | For backend services to access S3 (e.g. uploads) |
-| dify-plugin-crd       | `dify-plugin-crd-sa`    | IAM Role - S3 + ECR | To access S3 and operate on plugin images        |
-| dify-plugin-runner    | `dify-plugin-runner-sa` | IAM Role - ECR Pull | To pull plugin images and run plugins            |
-
-### Summary of Required or Optional Resources
-
-| Type           | Name (Example)                         | Required | Description                           |
-| -------------- | -------------------------------------- | -------- | ------------------------------------- |
-| EKS Cluster    | e.g., `dify-dev-cluster`               | ✅        | Must exist with OIDC provider enabled |
-| S3 Bucket      | e.g., `dify-ee-storage`                | ✅        | Must exist and be accessible          |
-| ECR Repository | e.g., `dify-ee-plugin-repo`            | Optional | Can be auto-created if not present    |
-| IAM Roles      | The three roles mentioned above        | ✅        | Reuse if existing, or create if not   |
-| IAM Policies   | S3, ECR, ECR Pull access policies      | ✅        | Attach to respective roles            |
-| OIDC Provider  | Obtain from EKS and associate with IAM | ✅        | Required for IRSA trust policy        |
-
----
-
-Users may also contact the Dify technical support team to obtain a one-click setup script:
-
-```bash
-bash ./irsa_one_click.sh
+```
+./irsa_one_click.sh
 ```
 
-✅ After completing the above steps, proceed with the rest of the deployment.
+##### 🔨Option B: Manually setup
 
-### Modify `values.yaml`
+1. **Enable the IAM OIDC provider for your EKS cluster**
+
+   Follow the [official AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) to associate your EKS cluster with an OIDC identity provider. This step is required before you can use IAM Roles for Service Accounts (IRSA).
+
+2. **Setup IAM Policy**
+
+   | **Item**        | **Example Naming**                                 | **Description**                                       |
+   | --------------- | -------------------------------------------------- | ----------------------------------------------------- |
+   | S3 Policy Name  | `dify-ee-irsa-<cluster_name>-s3-policy`            | Full access to the specified S3 bucket                |
+   | ECR Policy Name | `dify-ee-irsa-<cluster_name>-ecr-policy`           | Full access to ECR and read-only access to CloudTrail |
+   | ECR Policy Name | `dify-ee-irsa-<cluster_name>-ecr-pull-only-policy` | Allows pull-only operations from ECR                  |
+
+3. **Setup Role with policy**
+
+   | Item                     | **Example Naming**                          | policy                                                       |
+   | ------------------------ | ------------------------------------------- | ------------------------------------------------------------ |
+   | IAM Role - S3            | `DifyEE-Role-<cluster_name>-s3`             | `dify-ee-irsa-<cluster_name>-s3-policy`                      |
+   | IAM Role - S3 + ECR      | `DifyEE-Role-<cluster_name>-s3-ecr`         | `dify-ee-irsa-<cluster_name>-s3-policy` `dify-ee-irsa-<cluster_name>-ecr-policy` |
+   | IAM Role - ECR Pull-only | `DifyEE-Role-<cluster_name>-ecr-image-pull` | `dify-ee-irsa-<cluster_name>-ecr-pull-only-policy`           |
+
+4. **Setup ServiceAccount with IAM Role** 
+
+   | Purpose                   | Default Name            | Bound IAM Role                              | Description                                        |
+   | ------------------------- | ----------------------- | ------------------------------------------- | -------------------------------------------------- |
+   | For dify-api, dify-worker | `dify-api-sa`           | `DifyEE-Role-<cluster_name>-s3`             | Backend services access S3 for file uploads etc.   |
+   | For dify-plugin-crd build | `dify-plugin-crd-sa`    | `DifyEE-Role-<cluster_name>-s3-ecr`         | Accesses S3 and operates plugin image repositories |
+   | For dify-plugin runtime   | `dify-plugin-runner-sa` | `DifyEE-Role-<cluster_name>-ecr-image-pull` | Pulls plugin images for running plugins            |
+
+#### Step 2: Set Environment Variables
+
+Configure environment variables as per the release notes (e.g., `S3_REGION`, `S3_BUCKET_NAME`).
+
+#### Step 3: Update `values.yaml`
 
 ```yaml
 persistence:
@@ -161,6 +174,7 @@ api:
   innerApi:
     enabled: true
     apiKey: "dify123456"
+  serverWorkerAmount: 1
   serviceAccountName: "dify-api-sa"
 
 worker:
@@ -177,12 +191,12 @@ plugin_connector:
   apiKey: "dify123456"
   customServiceAccount: "dify-plugin-build-sa"
   runnerServiceAccount: "dify-plugin-build-run-sa"
-  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/"
+  imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
 ```
 
-### Add Plugin Database Configuration
+#### Step 4: Add Plugin Daemon Database Configuration
 
 ```yaml
 externalPostgres:
@@ -197,19 +211,15 @@ externalPostgres:
       sslmode: "disable"
 ```
 
----
+#### Step 5: Follow the release note to Upgrade
 
-## 4. Upgrade Helm Release
-
-```bash
-helm upgrade dify dify/dify-ee -n default --version 3.0.0
-```
+https://langgenius.github.io/dify-helm/#/pages/3_0_0
 
 ---
 
 ## Notes
 
-- ❌ **Redis Cluster mode is not supported**
-- 🌐 EKS nodes must have internet access or be configured with a NAT Gateway
+- ❌ **Redis cluster mode is not supported**
+- 🌐 EKS nodes must have internet access or be behind a NAT gateway
 
 ---
