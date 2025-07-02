@@ -105,31 +105,31 @@
         {
           "group": "Identity Authentication",
           "pages": [
-            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/introduction",
-            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/enterprise-user-auth",
-            "versions/2-8-x/3-0-x/en-us/administrator-guide/authentication/webapp-external-user-auth",
+            "versions/3-0-x/en-us/administrator-guide/authentication/introduction",
+            "versions/3-0-x/en-us/administrator-guide/authentication/enterprise-user-auth",
+            "versions/3-0-x/en-us/administrator-guide/authentication/webapp-external-user-auth",
             {
               "group": "Configure SSO Authentication",
               "pages": [
-                "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/introduction",
+                "versions/3-0-x/en-us/administrator-guide/sso/introduction",
                 {
                   "group": "Okta",
                   "pages": [
-                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/oidc",
-                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/saml",
-                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/okta/oauth2"
+                    "versions/3-0-x/en-us/administrator-guide/sso/okta/oidc",
+                    "versions/3-0-x/en-us/administrator-guide/sso/okta/saml",
+                    "versions/3-0-x/en-us/administrator-guide/sso/okta/oauth2"
                   ]
                 },
                 {
                   "group": "Azure",
                   "pages": [
-                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/azure/saml"
+                    "versions/3-0-x/en-us/administrator-guide/sso/azure/saml"
                   ]
                 },
                 {
                   "group": "GitHub",
                   "pages": [
-                    "versions/2-8-x/3-0-x/en-us/administrator-guide/sso/github/oauth2"
+                    "versions/3-0-x/en-us/administrator-guide/sso/github/oauth2"
                   ]
                 }
               ]
@@ -142,8 +142,8 @@
         {
           "group": "System Settings",
           "pages": [
-            "versions/2-8-x/3-0-x/en-us/administrator-guide/systems/users",
-            "versions/2-8-x/3-0-x/en-us/administrator-guide/systems/2sv"
+            "versions/3-0-x/en-us/administrator-guide/systems/users",
+            "versions/3-0-x/en-us/administrator-guide/systems/2sv"
           ]
         },
         "3-0-x/en-us/administrator-guide/faq"
@@ -225,7 +225,7 @@
         {
           "group": "Application Publishing",
           "pages": [
-            "versions/2-8-x/3-0-x/en-us/user-guide/application-publishing/permission-management",
+            "versions/3-0-x/en-us/user-guide/application-publishing/permission-management",
             {
               "group": "Publish as a Single-page Web App",
               "pages": [
