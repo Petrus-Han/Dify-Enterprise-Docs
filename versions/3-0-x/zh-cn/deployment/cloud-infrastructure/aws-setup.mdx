@@ -205,13 +205,25 @@ externalPostgres:
       sslmode: "disable"
 ```
 
-#### 步骤 5：根据发布日志升级
+#### 步骤 5：根据发布日志升级（安装）
 
 https://langgenius.github.io/dify-helm/#/pages/3_0_0
 
----
+#### 步骤 6：给应用自建的 ServiceAccount 增加 S3 权限
 
+ServiceAccount 名称：`dify-plugin-connector-sa`
 
+```bash
+kubesctl annotate serviceaccount -n {namespace} dify-plugin-connector-sa eks.amazonaws.com/role-arn={arn_of_IAM_S3}
+```
+
+如果你使用`./irsa_one_click.sh` 创建了 s3 读写的角色 ，这个 arn 会出现在脚本执行的末尾。
+
+#### 步骤7：重启 Dify Deamon Pod
+
+```bash
+kubectl delete pod {dify-plugin-daemon_name}
+```
 
 ## 注意事项
 

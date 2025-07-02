@@ -1,6 +1,7 @@
 ---
 title: AWS デプロイガイド
 version: '日本語'
+
 ---
 
 # Dify Enterprise Edition デプロイガイド (AWS)
@@ -41,9 +42,11 @@ Dify は、AWS サービスへのアクセスに以下の 2 つの方式をサ�
 
 ````bash
 kubectl create secret generic image-repo-secret --from-file=<path to .aws/credentials>
+````
 
-Step 3: values.yaml の更新
+### **Step 3:** **values.yaml の更新**
 
+```bash
 persistence:
   type: "s3"
   s3:
@@ -66,9 +69,13 @@ plugin_connector:
   imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
+```
 
-Step 4: Plugin Daemon の DB 設定
 
+
+### **Step 4: Plugin Daemon のデータベース設定**
+
+```bash
 externalPostgres:
   enabled: true
   address: "rds_address"
@@ -79,72 +86,81 @@ externalPostgres:
       username: "{user}"
       password: "{password}"
       sslmode: "disable"
+```
 
-Step 5: Helm リリースのアップグレード
+### **Step 5:** 
 
-helm upgrade dify dify/dify-ee -n default --version 3.0.0-beta
+### **リリースノートに従ってアップグレード（インストール）**
 
+https://langgenius.github.io/dify-helm/#/pages/3_0_0
 
-⸻
+------
 
-3. IRSA 方式
+## **3. IRSA モード**
 
-エンタープライズ環境ではアクセスキーの管理が厳格であるため、AWS Pod Identity (IRSA) の利用を推奨します。
+Access Key は企業環境で厳格に管理されるため、AWS Pod Identity (IRSA) の利用を推奨します。
 
-✅ 利点
-	•	AWS のセキュリティベストプラクティスに準拠
-	•	プラグイン実行環境へのきめ細かい制御が可能
+### **✅ 利点**
 
-セットアップ手順
+- AWS のセキュリティベストプラクティスに準拠
+- プラグイン実行環境のきめ細かな制御が可能
 
-Step 1: IAM ロールと Service Account の作成
-	•	前提条件
-	•	利用可能な AWS リージョンおよび EKS クラスター
-	•	Dify のファイルストレージ用 S3 バケット
-	•	kubectl がローカルにインストールされ、対象の EKS クラスターへアクセスできること
-	•	AWS CLI がローカルにインストールされ、認証情報が設定されていること
+### **セットアップ**
 
-🚀オプション A: ワンクリックスクリプトの実行
+#### **Step 1: IAM ロールと Service Account の準備**
 
-​	‼️ワンクリックスクリプトはデモ・テスト目的専用です。本番利用には自社のセキュリティ要件に合わせたスクリプトを作成してください。このデモスクリプトは Dify FDE チームから入手可能です。
+- ##### **前提条件**
 
+  - 利用可能な AWS リージョンおよび EKS クラスターが存在すること
+  - Dify のファイル保存用の既存の S3 バケットがあること
+  - kubectl がローカルにインストール・設定され、対象 EKS クラスターへアクセスできること
+  - AWS CLI がインストールされ、ローカルに認証情報が設定されていること
+
+##### **🚀オプション A: ワンクリックスクリプトの実行**
+
+​	**‼️ ワンクリックスクリプトはデモおよびテスト用です。実運用に合わせて独自のスクリプトを開発してください。このデモスクリプトは Dify FDE チームから入手可能です。**
+
+```
 ./irsa_one_click.sh
+```
 
-🔨オプション B: 手動設定
-	1.	EKS クラスターに対する IAM OIDC プロバイダの有効化
-AWS 公式ドキュメント に従い、EKS クラスターを OIDC ID プロバイダに関連付けます。
-IAM Roles for Service Accounts (IRSA) の利用にはこのステップが必須です。
-	2.	IAM ポリシーの作成
+##### **🔨オプション B: 手動設定**
 
-項目	例	説明
-S3 ポリシー名	dify-ee-irsa-<cluster_name>-s3-policy	指定した S3 バケットへのフルアクセス権限
-ECR ポリシー名	dify-ee-irsa-<cluster_name>-ecr-policy	ECR へのフルアクセス、および CloudTrail 読み取り
-ECR Pull 専用ポリシー名	dify-ee-irsa-<cluster_name>-ecr-pull-only-policy	ECR からのプルのみを許可
+1. **EKS クラスターで IAM OIDC プロバイダを有効化**
 
+   EKS クラスターと OIDC ID プロバイダを関連付けるために、[AWS公式ドキュメント](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) の手順に従ってください。この手順を完了しないと、IRSA を利用できません。
 
-	3.	ロールの作成とポリシーの関連付け
+2. **IAM ポリシーの作成**
 
-項目	例	ポリシー
-IAM Role - S3	DifyEE-Role-<cluster_name>-s3	dify-ee-irsa-<cluster_name>-s3-policy
-IAM Role - S3 + ECR	DifyEE-Role-<cluster_name>-s3-ecr	dify-ee-irsa-<cluster_name>-s3-policy  dify-ee-irsa-<cluster_name>-ecr-policy
-IAM Role - ECR Pull専用	DifyEE-Role-<cluster_name>-ecr-image-pull	dify-ee-irsa-<cluster_name>-ecr-pull-only-policy
+| **項目**        | **例の命名**                                     | **説明**                                                     |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| S3 Policy Name  | dify-ee-irsa-<cluster_name>-s3-policy            | 指定した S3 バケットへの完全アクセス                         |
+| ECR Policy Name | dify-ee-irsa-<cluster_name>-ecr-policy           | ECR への完全アクセスおよび CloudTrail の読み取り専用アクセス |
+| ECR Policy Name | dify-ee-irsa-<cluster_name>-ecr-pull-only-policy | ECR からの pull のみ許可                                     |
 
+1. **ポリシー付き IAM ロールの作成**
 
-	4.	IAM Role と ServiceAccount の関連付け
+| **項目**                 | **例の命名**                              | **policy**                                                   |
+| ------------------------ | ----------------------------------------- | ------------------------------------------------------------ |
+| IAM Role - S3            | DifyEE-Role-<cluster_name>-s3             | dify-ee-irsa-<cluster_name>-s3-policy                        |
+| IAM Role - S3 + ECR      | DifyEE-Role-<cluster_name>-s3-ecr         | dify-ee-irsa-<cluster_name>-s3-policy dify-ee-irsa-<cluster_name>-ecr-policy |
+| IAM Role - ECR Pull-only | DifyEE-Role-<cluster_name>-ecr-image-pull | dify-ee-irsa-<cluster_name>-ecr-pull-only-policy             |
 
-目的	デフォルト名	関連付ける IAM Role	説明
-dify-api, dify-worker 用	dify-api-sa	DifyEE-Role-<cluster_name>-s3	バックエンドが S3 にファイルアップロード等を行う
-dify-plugin-crd ビルド用	dify-plugin-crd-sa	DifyEE-Role-<cluster_name>-s3-ecr	S3 とプラグインイメージリポジトリへのアクセス
-dify-plugin 実行環境用	dify-plugin-runner-sa	DifyEE-Role-<cluster_name>-ecr-image-pull	プラグイン実行時に ECR からイメージをプルする
+1. **IAM ロールを ServiceAccount に関連付け**
 
+| **用途**                   | **デフォルト名**      | **バインドする IAM ロール**               | **説明**                                                     |
+| -------------------------- | --------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| dify-api, dify-worker 用   | dify-api-sa           | DifyEE-Role-<cluster_name>-s3             | バックエンドサービスが S3 にアクセス（ファイルアップロードなど） |
+| dify-plugin-crd のビルド用 | dify-plugin-crd-sa    | DifyEE-Role-<cluster_name>-s3-ecr         | S3 へのアクセスやプラグインイメージレポジトリの操作を行う    |
+| dify-plugin 実行時用       | dify-plugin-runner-sa | DifyEE-Role-<cluster_name>-ecr-image-pull | プラグイン実行時のイメージ pull に利用                       |
 
+#### **Step 2: 環境変数の設定**
 
-Step 2: 環境変数の設定
+リリースノートに従って、S3_REGION、S3_BUCKET_NAME などの環境変数を設定します。
 
-S3_REGION や S3_BUCKET_NAME など、リリースノートに記載の環境変数を設定してください。
+#### **Step 3:** **values.yamlの更新**
 
-Step 3: values.yaml の更新
-
+```bash
 persistence:
   type: "s3"
   s3:
@@ -180,9 +196,11 @@ plugin_connector:
   imageRepoPrefix: "{account_id}.dkr.ecr.{region}.amazonaws.com/dify-ee"
   imageRepoType: ecr
   ecrRegion: "us-west-2"
+```
 
-Step 4: Plugin Daemon の DB 設定を追加
+#### **Step 4: Plugin Daemon のデータベース設定**
 
+```bash
 externalPostgres:
   enabled: true
   address: "rds_address"
@@ -193,15 +211,29 @@ externalPostgres:
       username: "{user}"
       password: "{password}"
       sslmode: "disable"
+```
 
-Step 5: リリースノートに従いアップグレードを実施
+#### **Step 5:** **リリースノートに従ってアップグレード（インストール）**
 
 https://langgenius.github.io/dify-helm/#/pages/3_0_0
 
-⸻
+#### **Step 6: カスタム ServiceAccount に S3 権限を付与**
 
-注意事項
-	•	❌ Redis クラスターモードはサポートされていません
-	•	🌐 EKS ノードはインターネット接続、または NAT Gateway 経由のアクセスが必要です
+ServiceAccount 名: dify-plugin-connector-sa
 
-⸻
+```bash
+kubectl annotate serviceaccount -n {namespace} dify-plugin-connector-sa eks.amazonaws.com/role-arn={arn_of_IAM_S3}
+```
+
+もし ./irsa_one_click.sh を使って S3 読み書きロールを作成した場合、この ARN はスクリプト実行の最後に表示されます。
+
+#### **Step 7: Dify Daemon Pod を再起動**
+
+```bash
+kubectl delete pod {dify-plugin-daemon_name}
+```
+
+## **Notes**
+
+- ❌ **Redis クラスターモードはサポートされていません**
+- 🌐 EKS ノードはインターネットアクセスが可能、または NAT Gateway の背後に配置されている必要があります
